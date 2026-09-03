@@ -1,5 +1,6 @@
 package com.chacuio.ticketvortexapi.user.model;
 
+import com.chacuio.ticketvortexapi.reservation.model.Reservation;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -7,6 +8,8 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -51,4 +54,8 @@ public class User {
     @LastModifiedDate
     @Column(name = "updated_at")
     private Instant updatedAt;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.ALL)
+    @Builder.Default
+    private List<Reservation> reservations = new ArrayList<>();
 }
