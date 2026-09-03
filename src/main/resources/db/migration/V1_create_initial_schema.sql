@@ -31,7 +31,7 @@ CREATE TABLE zones(
     capacity INTEGER NOT NULL,
     event_id UUID NOT NULL,
     version INTEGER NOT NULL DEFAULT 1,
-    created_at TIMESTAMP NOT NULL CURRENT_TIMESTAMP,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
 
     CONSTRAINT fk_event FOREIGN KEY (event_id) REFERENCES event(id)
@@ -42,7 +42,7 @@ CREATE TABLE reservations(
     status VARCHAR(20) NOT NULL DEFAULT 'RESERVED',
     user_id UUID NOT NULL,
     zone_id UUID NOT NULL,
-    idempotency_key UUID,
+    idempotency_key UUID UNIQUE ,
     transaction_id UUID,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     expires_at TIMESTAMP,
@@ -51,7 +51,7 @@ CREATE TABLE reservations(
     CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id),
     CONSTRAINT fk_zone FOREIGN KEY (zone_id) REFERENCES zones(id),
 
-    CONSTRAINT chk_reservations_status CHECK ( role IN ('RESERVED', 'CONFIRMED', 'CANCELLED', 'EXPIRED') )
+    CONSTRAINT chk_reservations_status CHECK ( status IN ('RESERVED', 'CONFIRMED', 'CANCELLED', 'EXPIRED') )
 );
 
 CREATE INDEX idx_reservations_zone_id ON reservations(zone_id)
