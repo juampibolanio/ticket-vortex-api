@@ -44,8 +44,8 @@ CREATE TABLE reservations(
     zone_id UUID NOT NULL,
     idempotency_key UUID UNIQUE ,
     transaction_id UUID,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    expires_at TIMESTAMP,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    expires_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP,
 
     CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id),
