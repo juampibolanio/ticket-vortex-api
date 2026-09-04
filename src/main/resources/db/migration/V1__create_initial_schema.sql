@@ -13,11 +13,11 @@ CREATE TABLE users(
     CONSTRAINT chk_users_role CHECK ( role IN ('CUSTOMER', 'ADMIN') )
 );
 
-CREATE TABLE event(
+CREATE TABLE events(
     id UUID PRIMARY KEY,
     title VARCHAR(120) NOT NULL UNIQUE,
     description VARCHAR(500),
-    date DATE NOT NULL,
+    date TIMESTAMP NOT NULL,
     location VARCHAR(120) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP
