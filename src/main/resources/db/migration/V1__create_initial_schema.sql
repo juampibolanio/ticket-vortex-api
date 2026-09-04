@@ -34,7 +34,7 @@ CREATE TABLE zones(
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
 
-    CONSTRAINT fk_event FOREIGN KEY (event_id) REFERENCES event(id)
+    CONSTRAINT fk_event FOREIGN KEY (event_id) REFERENCES events(id)
 );
 
 CREATE TABLE reservations(
