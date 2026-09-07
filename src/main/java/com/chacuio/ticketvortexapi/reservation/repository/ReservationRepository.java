@@ -2,6 +2,7 @@ package com.chacuio.ticketvortexapi.reservation.repository;
 
 import com.chacuio.ticketvortexapi.reservation.dto.ReservationSummaryDTO;
 import com.chacuio.ticketvortexapi.reservation.model.Reservation;
+import com.chacuio.ticketvortexapi.reservation.model.Status;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,10 +15,13 @@ public interface ReservationRepository extends JpaRepository<Reservation, UUID> 
 
     @Query("SELECT COUNT(r) FROM Reservation r " +
             "WHERE r.zone.id = :zone_id " +
-            "AND (r.status = :statusConfirmed OR (r.status = :statusReserved AND r.expiresAt > :current_time))")
+            "AND (r.status = :status_confirmed OR (r.status = :status_reserved AND r.expiresAt > :current_time))")
     Long countUnavailablePlacesByZone(
             @Param("zone_id") UUID zoneId,
-            @Param("current_time") Instant currentTime);
+            @Param("current_time") Instant currentTime,
+            @Param("status_confirmed") Status statusConfirmed,
+            @Param("status_reserved") Status statusReserved
+    );
 
     @Query("""
         SELECT new com.chacuio.ticketvortexapi.reservation.dto.ReservationSummaryDTO(
@@ -37,4 +41,23 @@ public interface ReservationRepository extends JpaRepository<Reservation, UUID> 
         JOIN z.event e
     """)
     List<ReservationSummaryDTO> findAllSummarized();
+
+    @Query("""
+        SELECT COUNT(r)
+        FROM Reservation r
+        JOIN r.zone z
+        WHERE r.user.id = :user_id
+            AND z.event.id = :event_id
+            AND (
+                r.status = :status_confirmed
+                    OR (r.status = :status_reserved AND r.expiresAt > :current_time)
+                )
+    """)
+    Long countActiveReservationsForUserAndEvent(
+            @Param("user_id") UUID userId,
+            @Param("event_id") UUID eventId,
+            @Param("current_time") Instant currentTime,
+            @Param("status_confirmed") Status statusConfirmed,
+            @Param("status_reserved") Status statusReserved
+            );
 }
