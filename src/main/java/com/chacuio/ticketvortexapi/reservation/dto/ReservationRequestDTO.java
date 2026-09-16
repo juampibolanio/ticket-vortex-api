@@ -4,6 +4,6 @@ import java.util.UUID;
 
 public record ReservationRequestDTO(
         UUID zoneId,
-        UUID customerId,
+        Integer quantity,
         UUID idempotencyKey
 ) {}
