@@ -60,4 +60,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, UUID> 
             @Param("status_confirmed") Status statusConfirmed,
             @Param("status_reserved") Status statusReserved
             );
+
+    boolean existsByIdempotencyKey(UUID uuid);
+
+    List<Reservation> findByIdempotencyKey(UUID uuid);
+
 }
