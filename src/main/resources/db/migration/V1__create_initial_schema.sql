@@ -42,7 +42,7 @@ CREATE TABLE reservations(
     status VARCHAR(20) NOT NULL DEFAULT 'RESERVED',
     user_id UUID NOT NULL,
     zone_id UUID NOT NULL,
-    idempotency_key UUID UNIQUE ,
+    idempotency_key UUID ,
     transaction_id UUID,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     expires_at TIMESTAMP NOT NULL,
