@@ -8,7 +8,7 @@ import java.util.UUID;
 public interface ReservationService {
     List<ReservationSummaryDTO> findAll();
     ReservationResponseDTO findById(UUID id);
-    ReservationResponseDTO reserve(ReservationRequestDTO dto);
+    List<ReservationResponseDTO> reserve(ReservationRequestDTO dto, UUID customerId);
     ConfirmPaymentResponseDTO confirmPayment(ConfirmPaymentRequestDTO dto);
     void delete(UUID id);
 }
