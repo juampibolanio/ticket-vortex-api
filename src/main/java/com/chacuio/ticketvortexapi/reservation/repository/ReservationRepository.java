@@ -12,16 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ReservationRepository extends JpaRepository<Reservation, UUID> {
-
-    @Query("SELECT COUNT(r) FROM Reservation r " +
-            "WHERE r.zone.id = :zone_id " +
-            "AND (r.status = :status_confirmed OR (r.status = :status_reserved AND r.expiresAt > :current_time))")
-    Long countUnavailablePlacesByZone(
-            @Param("zone_id") UUID zoneId,
-            @Param("current_time") Instant currentTime,
-            @Param("status_confirmed") Status statusConfirmed,
-            @Param("status_reserved") Status statusReserved
-    );
+    boolean existsByIdempotencyKey(UUID uuid);
 
     @Query("""
         SELECT new com.chacuio.ticketvortexapi.reservation.dto.ReservationSummaryDTO(
@@ -42,6 +33,20 @@ public interface ReservationRepository extends JpaRepository<Reservation, UUID> 
     """)
     List<ReservationSummaryDTO> findAllSummarized();
 
+    List<Reservation> findByIdempotencyKey(UUID uuid);
+
+    List<Reservation> findByStatusAndExpiresAtBefore(Status status, Instant currentTime);
+
+    @Query("SELECT COUNT(r) FROM Reservation r " +
+            "WHERE r.zone.id = :zone_id " +
+            "AND (r.status = :status_confirmed OR (r.status = :status_reserved AND r.expiresAt > :current_time))")
+    Long countUnavailablePlacesByZone(
+            @Param("zone_id") UUID zoneId,
+            @Param("current_time") Instant currentTime,
+            @Param("status_confirmed") Status statusConfirmed,
+            @Param("status_reserved") Status statusReserved
+    );
+
     @Query("""
         SELECT COUNT(r)
         FROM Reservation r
@@ -60,9 +65,4 @@ public interface ReservationRepository extends JpaRepository<Reservation, UUID> 
             @Param("status_confirmed") Status statusConfirmed,
             @Param("status_reserved") Status statusReserved
             );
-
-    boolean existsByIdempotencyKey(UUID uuid);
-
-    List<Reservation> findByIdempotencyKey(UUID uuid);
-
 }
