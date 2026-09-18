@@ -25,4 +25,16 @@ public class GlobalExceptionHandler {
                 .build();
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ErrorResponseDTO> handleResourceNotFoundException(RuntimeException ex, HttpServletRequest request) {
+        log.error("Resource not found: {}", ex.getMessage(), ex);
+        ErrorResponseDTO error = ErrorResponseDTO.builder()
+                .message(ex.getMessage())
+                .status(HttpStatus.NOT_FOUND.value())
+                .path(request.getRequestURI())
+                .timestamp(Instant.now(Clock.systemUTC()))
+                .build();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
 }
