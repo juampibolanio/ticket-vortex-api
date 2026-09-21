@@ -4,6 +4,7 @@ import jakarta.validation.constraints.*;
 import org.hibernate.validator.constraints.Length;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 public record ZoneRequestDTO(
         @NotBlank(message = "Name is required")
@@ -20,5 +21,8 @@ public record ZoneRequestDTO(
         @NotNull(message = "Capacity is required")
         @Positive(message = "The capacity must be positive")
         @Min(1)
-        Integer capacity
+        Integer capacity,
+
+        @NotNull(message = "Event ID is required")
+        UUID eventId
 ) { }
