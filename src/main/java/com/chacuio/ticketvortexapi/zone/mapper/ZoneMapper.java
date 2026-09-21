@@ -1,8 +1,8 @@
 package com.chacuio.ticketvortexapi.zone.mapper;
 
-import com.chacuio.ticketvortexapi.event.dto.EventSummaryDTO;
 import com.chacuio.ticketvortexapi.event.mapper.EventMapper;
 import com.chacuio.ticketvortexapi.event.model.Event;
+import com.chacuio.ticketvortexapi.zone.dto.ZoneRequestDTO;
 import com.chacuio.ticketvortexapi.zone.dto.ZoneResponseDTO;
 import com.chacuio.ticketvortexapi.zone.dto.ZoneSummaryDTO;
 import com.chacuio.ticketvortexapi.zone.model.Zone;
@@ -28,7 +28,7 @@ public class ZoneMapper {
         );
     }
 
-    public Zone toEntity(ZoneResponseDTO dto, Event event) {
+    public Zone toEntity(ZoneRequestDTO dto, Event event) {
         return Zone.builder()
                 .name(dto.name())
                 .description(dto.description())
@@ -44,6 +44,7 @@ public class ZoneMapper {
         return new ZoneSummaryDTO(
                 zone.getId(),
                 zone.getName(),
+                zone.getCapacity(),
                 zone.getEvent().getId()
         );
     }
