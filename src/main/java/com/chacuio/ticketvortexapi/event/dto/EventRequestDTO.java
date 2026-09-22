@@ -27,7 +27,7 @@ public record EventRequestDTO(
         @Length(min = 1, max = 120, message = "Location must be between 1 and 120 characters long")
         String location,
 
-        @NotEmpty(message = "And event must have at least one zone")
+        @NotEmpty(message = "An event must have at least one zone")
         @Valid
         List<ZoneRequestDTO> zones
 ) { }

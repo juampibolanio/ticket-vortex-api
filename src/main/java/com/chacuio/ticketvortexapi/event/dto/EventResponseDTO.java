@@ -1,6 +1,5 @@
 package com.chacuio.ticketvortexapi.event.dto;
 
-import com.chacuio.ticketvortexapi.zone.dto.ZoneResponseDTO;
 import com.chacuio.ticketvortexapi.zone.dto.ZoneSummaryDTO;
 
 import java.time.Instant;
