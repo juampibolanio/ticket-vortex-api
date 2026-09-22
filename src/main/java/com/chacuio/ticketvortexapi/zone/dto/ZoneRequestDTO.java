@@ -23,6 +23,5 @@ public record ZoneRequestDTO(
         @Min(1)
         Integer capacity,
 
-        @NotNull(message = "Event ID is required")
         UUID eventId
 ) { }
