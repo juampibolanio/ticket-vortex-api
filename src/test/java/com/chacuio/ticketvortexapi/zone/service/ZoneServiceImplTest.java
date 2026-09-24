@@ -84,20 +84,44 @@ class ZoneServiceImplTest {
         event.setId(eventId);
 
         UUID zoneId = UUID.randomUUID();
-        ZoneSummaryDTO expectedZoneSummaryDTO = new ZoneSummaryDTO(zoneId, "VIP", 20, eventId);
-
         ZoneRequestDTO requestDto = new ZoneRequestDTO("VIP", null, new BigDecimal(2000), 20, eventId);
 
+        Zone zoneEntity = new Zone();
+        Zone savedZone = new Zone();
+        savedZone.setId(zoneId);
+
+        ZoneSummaryDTO expectedDto = new ZoneSummaryDTO(zoneId, "VIP", 20, eventId);
+
         when(eventRepository.findById(eventId)).thenReturn(Optional.of(event));
-        when(zoneService.create(requestDto)).thenReturn(expectedZoneSummaryDTO);
+        when(zoneMapper.toEntity(requestDto, event)).thenReturn(zoneEntity);
+        when(zoneRepository.save(zoneEntity)).thenReturn(savedZone);
+        when(zoneMapper.toDtoSummary(savedZone)).thenReturn(expectedDto);
 
         // when
         ZoneSummaryDTO result = zoneService.create(requestDto);
 
         // then
         assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(expectedZoneSummaryDTO.getId());
-        verify(eventRepository, times(1)).findById(zoneId);
-        verify(zoneService, times(1)).create(requestDto);
+        assertThat(result.getId()).isEqualTo(zoneId);
+
+        verify(eventRepository, times(1)).findById(eventId);
+        verify(zoneRepository, times(1)).save(zoneEntity);
+    }
+
+    @Test
+    @DisplayName("Should throw ResourceNotFoundException when event does not exist during zone creation")
+    void createNewZone_EventNotFound() {
+        // given
+        UUID eventId = UUID.randomUUID();
+        ZoneRequestDTO requestDto = new ZoneRequestDTO("VIP", null, new BigDecimal(2000), 20, eventId);
+
+        when(eventRepository.findById(eventId)).thenReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> zoneService.create(requestDto))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessageContaining("Event not found with id: " + eventId);
+
+        verifyNoInteractions(zoneRepository.save(any()));
     }
 }
