@@ -22,6 +22,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -38,90 +39,168 @@ class ZoneServiceImplTest {
     @InjectMocks
     private ZoneServiceImpl zoneService;
 
+
     @Test
     @DisplayName("Should return ZoneResponseDTO when zone exists")
     void findByIdWithEvent_Success() {
-        // given (preparation)
+        // Given
         UUID zoneId = UUID.randomUUID();
+
         Zone zone = new Zone();
         zone.setId(zoneId);
 
         ZoneResponseDTO expectedResponse = new ZoneResponseDTO(
-                zoneId, "VIP", null, null, 100, null, 1, null, null
+                zoneId,
+                "VIP",
+                null,
+                null,
+                100,
+                null,
+                1,
+                null,
+                null
         );
 
-        when(zoneRepository.findByIdWithEvent(zoneId)).thenReturn(Optional.of(zone));
-        when(zoneMapper.toDto(zone)).thenReturn(expectedResponse);
+        when(zoneRepository.findByIdWithEvent(zoneId))
+                .thenReturn(Optional.of(zone));
 
-        // when (execution)
-        ZoneResponseDTO result = zoneService.findByIdWithEvent(zoneId);
+        when(zoneMapper.toDto(zone))
+                .thenReturn(expectedResponse);
 
-        // then (asserts)
-        assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(zoneId);
-        verify(zoneRepository, times(1)).findByIdWithEvent(zoneId);
+        // When
+        ZoneResponseDTO result =
+                zoneService.findByIdWithEvent(zoneId);
+
+        // Then
+        assertThat(result)
+                .isNotNull()
+                .isEqualTo(expectedResponse);
+
+        verify(zoneRepository)
+                .findByIdWithEvent(zoneId);
+
+        verify(zoneMapper)
+                .toDto(zone);
     }
 
     @Test
     @DisplayName("Should throw ResourceNotFoundException when zone does not exist")
     void findByIdWithEvent_NotFound() {
-        // given
+        // Given
         UUID zoneId = UUID.randomUUID();
-        when(zoneRepository.findByIdWithEvent(zoneId)).thenReturn(Optional.empty());
 
-        // when & then
-        assertThatThrownBy(() -> zoneService.findByIdWithEvent(zoneId))
+        when(zoneRepository.findByIdWithEvent(zoneId))
+                .thenReturn(Optional.empty());
+
+        // When & Then
+        assertThatThrownBy(
+                () -> zoneService.findByIdWithEvent(zoneId)
+        )
                 .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessageContaining("Zone not found with id: " + zoneId);
+                .hasMessage(
+                        "Zone not found with id: " + zoneId
+                );
+
+        verify(zoneRepository)
+                .findByIdWithEvent(zoneId);
+        verifyNoInteractions(zoneMapper);
     }
 
+
     @Test
-    @DisplayName("Should return a ZoneSummaryDTO if the creation was successful")
+    @DisplayName("Should return ZoneSummaryDTO if the creation was successful")
     void createNewZone_Success() {
-        // given
+        // Given
         UUID eventId = UUID.randomUUID();
+        UUID zoneId = UUID.randomUUID();
+
         Event event = new Event();
         event.setId(eventId);
 
-        UUID zoneId = UUID.randomUUID();
-        ZoneRequestDTO requestDto = new ZoneRequestDTO("VIP", null, new BigDecimal(2000), 20, eventId);
+        ZoneRequestDTO requestDto = new ZoneRequestDTO(
+                "VIP",
+                null,
+                new BigDecimal("2000"),
+                20,
+                eventId
+        );
 
         Zone zoneEntity = new Zone();
+
         Zone savedZone = new Zone();
         savedZone.setId(zoneId);
 
-        ZoneSummaryDTO expectedDto = new ZoneSummaryDTO(zoneId, "VIP", 20, eventId);
+        ZoneSummaryDTO expectedDto = new ZoneSummaryDTO(
+                zoneId,
+                "VIP",
+                20,
+                eventId
+        );
 
-        when(eventRepository.findById(eventId)).thenReturn(Optional.of(event));
-        when(zoneMapper.toEntity(requestDto, event)).thenReturn(zoneEntity);
-        when(zoneRepository.save(zoneEntity)).thenReturn(savedZone);
-        when(zoneMapper.toDtoSummary(savedZone)).thenReturn(expectedDto);
+        when(eventRepository.findById(eventId))
+                .thenReturn(Optional.of(event));
 
-        // when
-        ZoneSummaryDTO result = zoneService.create(requestDto);
+        when(zoneMapper.toEntity(requestDto, event))
+                .thenReturn(zoneEntity);
 
-        // then
-        assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(zoneId);
+        when(zoneRepository.save(zoneEntity))
+                .thenReturn(savedZone);
 
-        verify(eventRepository, times(1)).findById(eventId);
-        verify(zoneRepository, times(1)).save(zoneEntity);
+        when(zoneMapper.toDtoSummary(savedZone))
+                .thenReturn(expectedDto);
+
+        // When
+        ZoneSummaryDTO result =
+                zoneService.create(requestDto);
+
+        // Then
+        assertThat(result)
+                .isNotNull()
+                .isEqualTo(expectedDto);
+
+        verify(eventRepository)
+                .findById(eventId);
+
+        verify(zoneMapper)
+                .toEntity(requestDto, event);
+
+        verify(zoneRepository)
+                .save(zoneEntity);
+
+        verify(zoneMapper)
+                .toDtoSummary(savedZone);
     }
 
     @Test
     @DisplayName("Should throw ResourceNotFoundException when event does not exist during zone creation")
     void createNewZone_EventNotFound() {
-        // given
+        // Given
         UUID eventId = UUID.randomUUID();
-        ZoneRequestDTO requestDto = new ZoneRequestDTO("VIP", null, new BigDecimal(2000), 20, eventId);
 
-        when(eventRepository.findById(eventId)).thenReturn(Optional.empty());
+        ZoneRequestDTO requestDto = new ZoneRequestDTO(
+                "VIP",
+                null,
+                new BigDecimal("2000"),
+                20,
+                eventId
+        );
 
-        // when & then
-        assertThatThrownBy(() -> zoneService.create(requestDto))
+        when(eventRepository.findById(eventId))
+                .thenReturn(Optional.empty());
+
+        // When & Then
+        assertThatThrownBy(
+                () -> zoneService.create(requestDto)
+        )
                 .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessageContaining("Event not found with id: " + eventId);
+                .hasMessage(
+                        "Event not found with id: " + eventId
+                );
 
-        verifyNoInteractions(zoneRepository.save(any()));
+        verify(eventRepository)
+                .findById(eventId);
+
+        verifyNoInteractions(zoneRepository);
+        verifyNoInteractions(zoneMapper);
     }
 }
