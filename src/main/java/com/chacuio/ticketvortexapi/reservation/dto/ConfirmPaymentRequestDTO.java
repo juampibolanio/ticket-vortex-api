@@ -1,13 +1,13 @@
 package com.chacuio.ticketvortexapi.reservation.dto;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.UUID;
 
 public record ConfirmPaymentRequestDTO(
-        @NotBlank(message = "Transaction Id is required")
+        @NotNull(message = "Idempotency Key is required")
         UUID idempotencyKey,
 
-        @NotBlank(message = "Transaction Id is required")
+        @NotNull(message = "Transaction Id is required")
         UUID transactionId
 ) { }
