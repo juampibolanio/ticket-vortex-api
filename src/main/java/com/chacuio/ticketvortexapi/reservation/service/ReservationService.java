@@ -7,6 +7,7 @@ import java.util.UUID;
 
 public interface ReservationService {
     List<ReservationSummaryDTO> findAllByEventId(UUID eventId);
+    List<ReservationSummaryDTO> findAllByCustomerId(UUID customerId);
     ReservationResponseDTO findById(UUID id);
     List<ReservationResponseDTO> reserve(ReservationRequestDTO dto, UUID customerId);
     ConfirmPaymentResponseDTO confirmPayment(ConfirmPaymentRequestDTO dto);

@@ -40,6 +40,11 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
+    public List<ReservationSummaryDTO> findAllByCustomerId(UUID customerId) {
+        return reservationRep.findAllSummarizedByCustomerId(customerId);
+    }
+
+    @Override
     public ReservationResponseDTO findById(UUID id) {
         return reservationMapper.toDto(reservationRep.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Reservation with id: " + id + " not found")));
