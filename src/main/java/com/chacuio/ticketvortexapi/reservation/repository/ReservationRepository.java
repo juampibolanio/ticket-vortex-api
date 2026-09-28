@@ -27,11 +27,31 @@ public interface ReservationRepository extends JpaRepository<Reservation, UUID> 
             r.createdAt
             )
         FROM Reservation r
-        JOIN r.user u 
+        JOIN r.user u
         JOIN r.zone z
         JOIN z.event e
+        WHERE e.id = :event_id
     """)
-    List<ReservationSummaryDTO> findAllSummarized();
+    List<ReservationSummaryDTO> findAllSummarizedByEventId(@Param("event_id") UUID eventId);
+
+    @Query("""
+        SELECT new com.chacuio.ticketvortexapi.reservation.dto.ReservationSummaryDTO(
+            r.id,
+            u.id,
+            u.email,
+            z.id,
+            z.name,
+            r.status,
+            z.price,
+            r.expiresAt,
+            r.createdAt
+            )
+        FROM Reservation r
+        JOIN r.user u
+        JOIN r.zone z
+        WHERE u.id = :customer_id
+    """)
+    List<ReservationSummaryDTO> findAllSummarizedByCustomerId(@Param("customer_id") UUID customerId);
 
     List<Reservation> findByIdempotencyKey(UUID uuid);
 
