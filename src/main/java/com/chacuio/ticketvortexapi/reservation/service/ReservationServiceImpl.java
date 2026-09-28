@@ -35,8 +35,8 @@ public class ReservationServiceImpl implements ReservationService {
     private final ReservationMapper reservationMapper;
 
     @Override
-    public List<ReservationSummaryDTO> findAll() {
-        return reservationRep.findAllSummarized();
+    public List<ReservationSummaryDTO> findAllByEventId(UUID eventId) {
+        return reservationRep.findAllSummarizedByEventId(eventId);
     }
 
     @Override
@@ -68,7 +68,7 @@ public class ReservationServiceImpl implements ReservationService {
         // Check if the customer has more than 4 reservations with a status of "reserved" or "confirmed."
         Long activeReserves = reservationRep.countActiveReservationsForUserAndEvent(
                 customerId,
-                zone.getId(),
+                zone.getEvent().getId(),
                 Instant.now(Clock.systemUTC()),
                 Status.CONFIRMED,
                 Status.RESERVED);
