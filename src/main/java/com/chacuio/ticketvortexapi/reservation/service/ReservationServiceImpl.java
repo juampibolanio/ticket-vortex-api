@@ -140,7 +140,7 @@ public class ReservationServiceImpl implements ReservationService {
         // continue to confirm payment logic
         List<Reservation> reservations = reservationRep.findByIdempotencyKey(dto.idempotencyKey());
 
-        if (!reservations.isEmpty()) {
+        if (reservations.isEmpty()) {
             throw new ResourceNotFoundException("Reservations with idempotency id: " + dto.idempotencyKey() + " not found");
         }
 
