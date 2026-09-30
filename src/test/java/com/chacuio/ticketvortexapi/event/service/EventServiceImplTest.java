@@ -40,7 +40,7 @@ class EventServiceImplTest {
     private ZoneService zoneService;
 
     @InjectMocks
-    private EventService eventService;
+    private EventServiceImpl eventService;
 
     @Test
     @DisplayName("Should return an EventResponseDTO when event exists")
