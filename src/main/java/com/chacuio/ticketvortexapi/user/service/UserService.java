@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public interface UserService {
     List<UserSummaryDTO> findAll();
-    List<UserResponseDTO> findById(UUID id);
+    UserResponseDTO findById(UUID id);
     UserResponseDTO create(UserRequestDTO dto);
     UserResponseDTO patch(UUID id, UserRequestDTO dto);
     void delete(UUID id);
