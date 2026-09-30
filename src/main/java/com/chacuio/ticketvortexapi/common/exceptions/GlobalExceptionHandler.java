@@ -38,6 +38,17 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
+    public ResponseEntity<ErrorResponseDTO> handleDataConflictException(RuntimeException ex, HttpServletRequest request) {
+        log.error("Data conflict occurred: {}", ex.getMessage(), ex);
+        ErrorResponseDTO error = ErrorResponseDTO.builder()
+                .message(ex.getMessage())
+                .status(HttpStatus.CONFLICT.value())
+                .path(request.getRequestURI())
+                .timestamp(Instant.now(Clock.systemUTC()))
+                .build();
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
     public ResponseEntity<ErrorResponseDTO> handleNotEnoughCapacityException(RuntimeException ex, HttpServletRequest request) {
         log.error("Not enough capacity: {}", ex.getMessage(), ex);
         ErrorResponseDTO error = ErrorResponseDTO.builder()

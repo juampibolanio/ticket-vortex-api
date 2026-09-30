@@ -3,6 +3,7 @@ package com.chacuio.ticketvortexapi.user.dto;
 import com.chacuio.ticketvortexapi.user.model.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public record UserRequestDTO(
@@ -23,7 +24,7 @@ public record UserRequestDTO(
         @Size(min = 1, max = 50, message = "The document number field must be between 1 and 50 characters long")
         String documentNumber,
 
-        @NotBlank(message = "The role field is required")
+        @NotNull(message = "The role field is required")
         Role role,
 
         @NotBlank(message = "The password field is required")
