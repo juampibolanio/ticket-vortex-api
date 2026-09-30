@@ -37,4 +37,26 @@ public class GlobalExceptionHandler {
                 .build();
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
+
+    public ResponseEntity<ErrorResponseDTO> handleNotEnoughCapacityException(RuntimeException ex, HttpServletRequest request) {
+        log.error("Not enough capacity: {}", ex.getMessage(), ex);
+        ErrorResponseDTO error = ErrorResponseDTO.builder()
+                .message(ex.getMessage())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .path(request.getRequestURI())
+                .timestamp(Instant.now(Clock.systemUTC()))
+                .build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    public ResponseEntity<ErrorResponseDTO> handleReservationExpiredException(RuntimeException ex, HttpServletRequest request) {
+        log.error("Reservation expired: {}", ex.getMessage(), ex);
+        ErrorResponseDTO error = ErrorResponseDTO.builder()
+                .message(ex.getMessage())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .path(request.getRequestURI())
+                .timestamp(Instant.now(Clock.systemUTC()))
+                .build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
 }
