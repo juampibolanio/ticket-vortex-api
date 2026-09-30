@@ -1,4 +1,4 @@
-package com.chacuio.ticketvortexapi.reservations.controller;
+package com.chacuio.ticketvortexapi.reservation.controller;
 
 import com.chacuio.ticketvortexapi.event.model.Event;
 import com.chacuio.ticketvortexapi.event.repository.EventRepository;

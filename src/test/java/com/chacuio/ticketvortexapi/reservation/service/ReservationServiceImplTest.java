@@ -1,4 +1,4 @@
-package com.chacuio.ticketvortexapi.reservations.service;
+package com.chacuio.ticketvortexapi.reservation.service;
 
 import com.chacuio.ticketvortexapi.common.exceptions.ResourceNotFoundException;
 import com.chacuio.ticketvortexapi.event.model.Event;
@@ -14,7 +14,6 @@ import com.chacuio.ticketvortexapi.reservation.mapper.ReservationMapper;
 import com.chacuio.ticketvortexapi.reservation.model.Reservation;
 import com.chacuio.ticketvortexapi.reservation.model.Status;
 import com.chacuio.ticketvortexapi.reservation.repository.ReservationRepository;
-import com.chacuio.ticketvortexapi.reservation.service.ReservationServiceImpl;
 import com.chacuio.ticketvortexapi.user.model.User;
 import com.chacuio.ticketvortexapi.user.repository.UserRepository;
 import com.chacuio.ticketvortexapi.zone.model.Zone;
