@@ -1,19 +1,15 @@
 package com.chacuio.ticketvortexapi.zone.mapper;
 
-import com.chacuio.ticketvortexapi.event.mapper.EventMapper;
+import com.chacuio.ticketvortexapi.event.dto.EventSummaryDTO;
 import com.chacuio.ticketvortexapi.event.model.Event;
 import com.chacuio.ticketvortexapi.zone.dto.ZoneRequestDTO;
 import com.chacuio.ticketvortexapi.zone.dto.ZoneResponseDTO;
 import com.chacuio.ticketvortexapi.zone.dto.ZoneSummaryDTO;
 import com.chacuio.ticketvortexapi.zone.model.Zone;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class ZoneMapper {
-    private final EventMapper eventMapper;
-
     public ZoneResponseDTO toDto(Zone zone) {
         return new ZoneResponseDTO(
                 zone.getId(),
@@ -21,7 +17,7 @@ public class ZoneMapper {
                 zone.getDescription(),
                 zone.getPrice(),
                 zone.getCapacity(),
-                eventMapper.toDtoSummary(zone.getEvent()),
+                toEventSummaryDto(zone.getEvent()),
                 zone.getVersion(),
                 zone.getCreatedAt(),
                 zone.getUpdatedAt()
@@ -46,6 +42,17 @@ public class ZoneMapper {
                 zone.getName(),
                 zone.getCapacity(),
                 zone.getEvent().getId()
+        );
+    }
+
+    private EventSummaryDTO toEventSummaryDto(Event event) {
+        if (event == null) return null;
+
+        return new EventSummaryDTO(
+                event.getId(),
+                event.getTitle(),
+                event.getDate(),
+                event.getLocation()
         );
     }
 }
