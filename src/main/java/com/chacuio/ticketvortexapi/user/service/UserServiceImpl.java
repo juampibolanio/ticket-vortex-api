@@ -66,18 +66,14 @@ public class UserServiceImpl implements UserService{
         if (dto.lastName() != null) user.setLastName(dto.lastName());
         if (dto.email() != null) user.setEmail(dto.email());
         if (dto.documentNumber() != null) user.setDocumentNumber(dto.documentNumber());
-        if (dto.role() != null) user.setRole(dto.role());
 
         return userMapper.toDto(userRepository.save(user));
     }
 
     @Override
     public void delete(UUID id) {
-        if (userRepository.existsById(id)) {
-            userRepository.deleteById(id);
-        }
-        else {
-            throw new ResourceNotFoundException("User not found with id: " + id);
-        }
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+        userRepository.delete(user);
     }
 }
