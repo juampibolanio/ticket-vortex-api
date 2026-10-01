@@ -29,7 +29,6 @@ public class UserMapper {
                 .email(dto.email())
                 .documentNumber(dto.documentNumber())
                 .role(dto.role())
-                .password(dto.password())
                 .build();
     }
 
