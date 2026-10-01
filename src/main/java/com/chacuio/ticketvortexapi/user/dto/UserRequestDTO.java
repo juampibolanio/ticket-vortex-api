@@ -17,7 +17,7 @@ public record UserRequestDTO(
 
         @Email(message = "The email field must have a valid format")
         @NotBlank(message = "The email field is required")
-        @Size(max = 255, message = "The email field cannot exceed 254 characters")
+        @Size(max = 255, message = "The email field cannot exceed 255 characters")
         String email,
 
         @NotBlank(message = "The document number field is required")
