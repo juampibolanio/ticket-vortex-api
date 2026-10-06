@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-
+// revisar: La contraseña deberia estar en eeste DTO? o como se manejaria al momento de registrar un usuario? ya que el user module se relacionara con el auth
 public record UserRequestDTO(
         @NotBlank(message = "The first name field is required")
         @Size(min = 1, max = 120, message = "The first name field must be between 1 and 120 characters long")
