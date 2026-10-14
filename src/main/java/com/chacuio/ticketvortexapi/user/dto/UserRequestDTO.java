@@ -5,7 +5,8 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-// revisar: La contraseña deberia estar en eeste DTO? o como se manejaria al momento de registrar un usuario? ya que el user module se relacionara con el auth
+import org.hibernate.validator.constraints.Length;
+
 public record UserRequestDTO(
         @NotBlank(message = "The first name field is required")
         @Size(min = 1, max = 120, message = "The first name field must be between 1 and 120 characters long")
@@ -23,6 +24,10 @@ public record UserRequestDTO(
         @NotBlank(message = "The document number field is required")
         @Size(min = 1, max = 50, message = "The document number field must be between 1 and 50 characters long")
         String documentNumber,
+
+        @NotBlank(message = "The password field is required")
+        @Length(min = 8, max = 120, message = "The password field must be between 8 and 120 characters long")
+        String password,
 
         @NotNull(message = "The role field is required")
         Role role
