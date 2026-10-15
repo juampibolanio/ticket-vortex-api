@@ -10,14 +10,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 
 @SpringBootApplication
 @EnableConfigurationProperties(JwtProperties.class)
-@SecurityScheme(
-        name = "bearerAuth",
-        description = "JWT authentication",
-        scheme = "bearer",
-        type = SecuritySchemeType.HTTP,
-        bearerFormat = "JWT",
-        in = SecuritySchemeIn.HEADER
-)
 public class TicketvortexapiApplication {
 
 	public static void main(String[] args) {
