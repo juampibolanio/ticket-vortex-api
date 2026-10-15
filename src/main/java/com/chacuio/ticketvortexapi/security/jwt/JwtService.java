@@ -1,10 +1,11 @@
 package com.chacuio.ticketvortexapi.security.jwt;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
+import com.chacuio.ticketvortexapi.security.exception.InvalidOrMalFormedTokenException;
+import com.chacuio.ticketvortexapi.security.exception.TokenCannotRenewedException;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -60,6 +61,8 @@ public class JwtService {
                     .getPayload();
         } catch (ExpiredJwtException e) {
             return e.getClaims();
+        } catch (UnsupportedJwtException | MalformedJwtException | SignatureException | IllegalArgumentException e) {
+            throw new InvalidOrMalFormedTokenException("Invalid JWT token or mal formed");
         }
     }
 
@@ -92,7 +95,7 @@ public class JwtService {
 
     public String renewToken(String token, UserDetails userDetails) {
         if (!canBeTokenRenewed(token)) {
-            throw new RuntimeException("Token cannot be renewed");
+            throw new TokenCannotRenewedException("Token cannot be renewed");
         }
         return generateToken(userDetails);
     }
