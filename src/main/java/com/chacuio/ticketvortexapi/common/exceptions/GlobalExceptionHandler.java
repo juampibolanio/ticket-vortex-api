@@ -3,15 +3,18 @@ package com.chacuio.ticketvortexapi.common.exceptions;
 import com.chacuio.ticketvortexapi.reservation.exception.NotEnoughCapacityException;
 import com.chacuio.ticketvortexapi.reservation.exception.ReservationExpiredException;
 import com.chacuio.ticketvortexapi.reservation.exception.TicketLimitExceededException;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.Clock;
@@ -90,6 +93,17 @@ public class GlobalExceptionHandler {
             HttpServletRequest request) {
         log.error("An unexpected error occurred at {}", request.getRequestURI(), ex);
         return response("An unexpected error occurred", HttpStatus.INTERNAL_SERVER_ERROR, request);
+    }
+
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler({
+            JwtException.class,
+            AuthenticationException.class
+    })
+    public ResponseEntity<ErrorResponseDTO> handleForbiddenException(
+            AccessDeniedException ex,
+            HttpServletRequest request) {
+        return response(ex.getMessage(), HttpStatus.FORBIDDEN, request);
     }
 
     private ResponseEntity<ErrorResponseDTO> response(
