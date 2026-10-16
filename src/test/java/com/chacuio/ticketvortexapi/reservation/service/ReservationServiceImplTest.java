@@ -16,8 +16,10 @@ import com.chacuio.ticketvortexapi.reservation.model.Status;
 import com.chacuio.ticketvortexapi.reservation.repository.ReservationRepository;
 import com.chacuio.ticketvortexapi.user.model.User;
 import com.chacuio.ticketvortexapi.user.repository.UserRepository;
+import com.chacuio.ticketvortexapi.user.service.UserService;
 import com.chacuio.ticketvortexapi.zone.model.Zone;
 import com.chacuio.ticketvortexapi.zone.repository.ZoneRepository;
+import com.chacuio.ticketvortexapi.zone.service.ZoneService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,10 +43,10 @@ class ReservationServiceImplTest {
     private ReservationRepository reservationRepository;
 
     @Mock
-    private ZoneRepository zoneRepository;
+    private ZoneService zoneService;
 
     @Mock
-    private UserRepository userRepository;
+    private UserService userService;
 
     @Mock
     private ReservationMapper reservationMapper;
@@ -120,7 +122,7 @@ class ReservationServiceImplTest {
         assertEquals(List.of(expectedResponse), reservationService.reserve(request, customerId));
 
         verify(reservationRepository).findByIdempotencyKey(request.idempotencyKey());
-        verifyNoInteractions(zoneRepository, userRepository);
+        verifyNoInteractions(zoneService, userService);
         verify(reservationRepository, never()).save(any());
     }
 
@@ -129,7 +131,8 @@ class ReservationServiceImplTest {
     void reserve_ZoneNotFound_ThrowsException() {
         ReservationRequestDTO request = request(UUID.randomUUID(), 1);
         when(reservationRepository.existsByIdempotencyKey(request.idempotencyKey())).thenReturn(false);
-        when(zoneRepository.findByIdWithLock(request.zoneId())).thenReturn(Optional.empty());
+        when(zoneService.findEntityByIdWithLock(request.zoneId()))
+                .thenThrow(new ResourceNotFoundException("Zone not found"));
 
         ResourceNotFoundException exception = assertThrows(
                 ResourceNotFoundException.class,
@@ -137,7 +140,7 @@ class ReservationServiceImplTest {
         );
 
         assertEquals("Zone not found", exception.getMessage());
-        verifyNoInteractions(userRepository);
+        verifyNoInteractions(userService);
         verify(reservationRepository, never()).save(any());
     }
 
@@ -148,8 +151,8 @@ class ReservationServiceImplTest {
         UUID customerId = UUID.randomUUID();
         Zone zone = zone(5, UUID.randomUUID());
         when(reservationRepository.existsByIdempotencyKey(request.idempotencyKey())).thenReturn(false);
-        when(zoneRepository.findByIdWithLock(request.zoneId())).thenReturn(Optional.of(zone));
-        when(userRepository.findById(customerId)).thenReturn(Optional.empty());
+        when(zoneService.findEntityByIdWithLock(request.zoneId())).thenReturn(zone);
+        when(userService.findEntityById(customerId)).thenThrow(new ResourceNotFoundException("Customer not found"));
 
         ResourceNotFoundException exception = assertThrows(
                 ResourceNotFoundException.class,
@@ -167,8 +170,8 @@ class ReservationServiceImplTest {
         UUID customerId = UUID.randomUUID();
         Zone zone = zone(10, UUID.randomUUID());
         when(reservationRepository.existsByIdempotencyKey(request.idempotencyKey())).thenReturn(false);
-        when(zoneRepository.findByIdWithLock(request.zoneId())).thenReturn(Optional.of(zone));
-        when(userRepository.findById(customerId)).thenReturn(Optional.of(new User()));
+        when(zoneService.findEntityByIdWithLock(request.zoneId())).thenReturn(zone);
+        when(userService.findEntityById(customerId)).thenReturn(new User());
         when(reservationRepository.countActiveReservationsForUserAndEvent(
                 eq(customerId), eq(zone.getEvent().getId()), any(Instant.class),
                 eq(Status.CONFIRMED), eq(Status.RESERVED))).thenReturn(3L);
@@ -190,8 +193,8 @@ class ReservationServiceImplTest {
         UUID customerId = UUID.randomUUID();
         Zone zone = zone(3, UUID.randomUUID());
         when(reservationRepository.existsByIdempotencyKey(request.idempotencyKey())).thenReturn(false);
-        when(zoneRepository.findByIdWithLock(request.zoneId())).thenReturn(Optional.of(zone));
-        when(userRepository.findById(customerId)).thenReturn(Optional.of(new User()));
+        when(zoneService.findEntityByIdWithLock(request.zoneId())).thenReturn(zone);
+        when(userService.findEntityById(customerId)).thenReturn(new User());
         when(reservationRepository.countActiveReservationsForUserAndEvent(
                 eq(customerId), eq(zone.getEvent().getId()), any(Instant.class),
                 eq(Status.CONFIRMED), eq(Status.RESERVED))).thenReturn(0L);
@@ -215,8 +218,8 @@ class ReservationServiceImplTest {
         Zone zone = zone(5, UUID.randomUUID());
         ReservationResponseDTO expectedResponse = mock(ReservationResponseDTO.class);
         when(reservationRepository.existsByIdempotencyKey(request.idempotencyKey())).thenReturn(false);
-        when(zoneRepository.findByIdWithLock(request.zoneId())).thenReturn(Optional.of(zone));
-        when(userRepository.findById(customerId)).thenReturn(Optional.of(user));
+        when(zoneService.findEntityByIdWithLock(request.zoneId())).thenReturn(zone);
+        when(userService.findEntityById(customerId)).thenReturn(user);
         when(reservationRepository.countActiveReservationsForUserAndEvent(
                 eq(customerId), eq(zone.getEvent().getId()), any(Instant.class),
                 eq(Status.CONFIRMED), eq(Status.RESERVED))).thenReturn(1L);
