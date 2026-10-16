@@ -1,5 +1,6 @@
 package com.chacuio.ticketvortexapi.zone.service;
 
+import com.chacuio.ticketvortexapi.event.model.Event;
 import com.chacuio.ticketvortexapi.zone.dto.ZoneRequestDTO;
 import com.chacuio.ticketvortexapi.zone.dto.ZoneResponseDTO;
 import com.chacuio.ticketvortexapi.zone.dto.ZoneSummaryDTO;
@@ -11,6 +12,7 @@ import java.util.UUID;
 public interface ZoneService {
     List<ZoneSummaryDTO> findAllByEventId(UUID eventId);
     ZoneResponseDTO findByIdWithEvent(UUID id);
-    ZoneSummaryDTO create(ZoneRequestDTO zoneRequestDTO);
     Zone findEntityByIdWithLock(UUID id);
+    List<ZoneSummaryDTO> createAll(Event event, List<ZoneRequestDTO> zoneDtos);
+    ZoneSummaryDTO create(UUID eventId, ZoneRequestDTO zoneRequestDTO);
 }

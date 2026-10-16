@@ -53,19 +53,7 @@ public class EventServiceImpl implements EventService {
 
         Event savedEvent = eventRepository.save(event);
 
-        List<ZoneSummaryDTO> createdZones = new ArrayList<>();
-        for (ZoneRequestDTO zoneDto : dto.zones()) {
-            ZoneRequestDTO zoneWithEventId = new ZoneRequestDTO(
-                    zoneDto.name(),
-                    zoneDto.description(),
-                    zoneDto.price(),
-                    zoneDto.capacity(),
-                    savedEvent.getId()
-            );
-
-            ZoneSummaryDTO createdZone = zoneService.create(zoneWithEventId);
-            createdZones.add(createdZone);
-        }
+        List<ZoneSummaryDTO> createdZones = zoneService.createAll(savedEvent, dto.zones());
 
         return new EventResponseDTO(
                 savedEvent.getId(),

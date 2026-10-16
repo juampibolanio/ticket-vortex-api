@@ -33,11 +33,5 @@ public record ZoneRequestDTO(
         @NotNull(message = "Capacity is required")
         @Positive(message = "The capacity must be positive")
         @Min(1)
-        Integer capacity,
-
-        @Schema(
-                description = "ID of the event associated with this zone",
-                example = "550e8400-e29b-41d4-a716-446655440000"
-        )
-        UUID eventId // check if this field is necessary
+        Integer capacity
 ) { }

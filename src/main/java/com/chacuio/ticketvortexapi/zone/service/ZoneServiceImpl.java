@@ -37,9 +37,23 @@ public class ZoneServiceImpl implements ZoneService {
 
     @Transactional
     @Override
-    public ZoneSummaryDTO create(ZoneRequestDTO dto) {
-        Event event = eventRepository.findById(dto.eventId())
-                .orElseThrow(() -> new ResourceNotFoundException("Event not found with id: " + dto.eventId()));
+    public List<ZoneSummaryDTO> createAll(Event event, List<ZoneRequestDTO> zoneDtos) {
+        List<Zone> zones = zoneDtos.stream()
+                .map(dto -> mapper.toEntity(dto, event))
+                .toList();
+
+        List<Zone> savedZones = zoneRepository.saveAll(zones);
+
+        return savedZones.stream()
+                .map(mapper::toDtoSummary)
+                .toList();
+    }
+
+    @Transactional
+    @Override
+    public ZoneSummaryDTO create(UUID eventId, ZoneRequestDTO dto) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new ResourceNotFoundException("Event not found with id: " + eventId));
 
         Zone zone = mapper.toEntity(dto, event);
         Zone savedZone = zoneRepository.save(zone);
