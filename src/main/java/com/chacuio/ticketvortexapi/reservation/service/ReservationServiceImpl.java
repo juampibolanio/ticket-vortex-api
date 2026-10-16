@@ -10,9 +10,9 @@ import com.chacuio.ticketvortexapi.reservation.model.Reservation;
 import com.chacuio.ticketvortexapi.reservation.model.Status;
 import com.chacuio.ticketvortexapi.reservation.repository.ReservationRepository;
 import com.chacuio.ticketvortexapi.user.model.User;
-import com.chacuio.ticketvortexapi.user.repository.UserRepository;
+import com.chacuio.ticketvortexapi.user.service.UserService;
 import com.chacuio.ticketvortexapi.zone.model.Zone;
-import com.chacuio.ticketvortexapi.zone.repository.ZoneRepository;
+import com.chacuio.ticketvortexapi.zone.service.ZoneService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,9 +30,9 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ReservationServiceImpl implements ReservationService {
     private final ReservationRepository reservationRep;
-    private final ZoneRepository zoneRep;
-    private final UserRepository userRep;
     private final ReservationMapper reservationMapper;
+    private final ZoneService zoneService;
+    private final UserService userService;
 
     @Override
     public List<ReservationSummaryDTO> findAllByEventId(UUID eventId) {
@@ -63,12 +63,10 @@ public class ReservationServiceImpl implements ReservationService {
         }
 
         // search zone
-        Zone zone = zoneRep.findByIdWithLock(dto.zoneId())
-                .orElseThrow(() -> new ResourceNotFoundException("Zone not found"));
+        Zone zone = zoneService.findEntityByIdWithLock(dto.zoneId());
 
         // search customer
-        User user = userRep.findById(customerId)
-                .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
+        User user = userService.findEntityById(customerId);
 
         // Check if the customer has more than 4 reservations with a status of "reserved" or "confirmed."
         Long activeReserves = reservationRep.countActiveReservationsForUserAndEvent(
