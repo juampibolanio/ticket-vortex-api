@@ -45,4 +45,10 @@ public class ZoneServiceImpl implements ZoneService {
         Zone savedZone = zoneRepository.save(zone);
         return mapper.toDtoSummary(savedZone);
     }
+
+    @Override
+    public Zone findEntityByIdWithLock(UUID id) {
+        return zoneRepository.findByIdWithLock(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Zone not found"));
+    }
 }
