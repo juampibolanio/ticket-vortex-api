@@ -7,11 +7,13 @@ import com.chacuio.ticketvortexapi.event.service.EventService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,11 +23,14 @@ import java.util.UUID;
 @RequestMapping("/api/v1/events")
 @RequiredArgsConstructor
 @Tag(name = "Events", description = "Endpoints for managing events")
+@SecurityRequirement(name = "Admin Authentication")
+@PreAuthorize("hasRole('ADMIN')")
 public class EventController {
     private final EventService eventService;
 
     @Operation(summary = "Get all events", description = "Returns a list with all registered events")
     @ApiResponse(responseCode = "200", description = "Events retrieved successfully")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @GetMapping
     public ResponseEntity<List<EventSummaryDTO>> findAll() {
         return ResponseEntity.ok(eventService.findAll());
@@ -34,6 +39,7 @@ public class EventController {
     @Operation(summary = "Get event by ID", description = "Returns the complete information of an event, including its zones.")
     @ApiResponse(responseCode = "200", description = "Event found successfully")
     @ApiResponse(responseCode = "404", description = "Event not found")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @GetMapping("/{id}")
     public ResponseEntity<EventResponseDTO> findOneById(
             @Parameter(description = "Unique identifier of the event", example = "550e8400-e29b-41d4-a716-446655440000")
