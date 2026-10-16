@@ -7,7 +7,7 @@ import com.chacuio.ticketvortexapi.auth.dto.RegisterRequestDTO;
 import com.chacuio.ticketvortexapi.security.jwt.JwtService;
 import com.chacuio.ticketvortexapi.user.dto.UserRequestDTO;
 import com.chacuio.ticketvortexapi.user.dto.UserResponseDTO;
-import com.chacuio.ticketvortexapi.user.service.UserServiceImpl;
+import com.chacuio.ticketvortexapi.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
-    private final UserServiceImpl userService;
+    private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
