@@ -10,6 +10,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -51,7 +52,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponseDTO> handleAccessDenied(
             AccessDeniedException ex,
             HttpServletRequest request) {
-        return response(ex.getMessage(), HttpStatus.FORBIDDEN, request);
+        return response("Access denied: You do not have permission to access this resource", HttpStatus.FORBIDDEN, request);
     }
 
     @ExceptionHandler({
@@ -95,15 +96,14 @@ public class GlobalExceptionHandler {
         return response("An unexpected error occurred", HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
 
-    @ResponseStatus(HttpStatus.FORBIDDEN)
     @ExceptionHandler({
             JwtException.class,
             AuthenticationException.class
     })
     public ResponseEntity<ErrorResponseDTO> handleForbiddenException(
-            AccessDeniedException ex,
+            Exception ex,
             HttpServletRequest request) {
-        return response(ex.getMessage(), HttpStatus.FORBIDDEN, request);
+        return response(ex.getMessage(), HttpStatus.UNAUTHORIZED, request);
     }
 
     private ResponseEntity<ErrorResponseDTO> response(

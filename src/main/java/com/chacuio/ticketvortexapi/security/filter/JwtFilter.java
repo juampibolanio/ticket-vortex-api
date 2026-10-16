@@ -37,7 +37,6 @@ public class JwtFilter extends OncePerRequestFilter {
         String authorization = request.getHeader("Authorization");
 
         if (authorization == null || !authorization.startsWith("Bearer ")) {
-            logger.error("No token found");
             filterChain.doFilter(request, response);
             return;
         }
@@ -82,6 +81,7 @@ public class JwtFilter extends OncePerRequestFilter {
         } catch (Exception e) {
             log.error("Error validating token: {}", e.getMessage());
             handlerExceptionResolver.resolveException(request, response, null, e);
+            return;
         }
 
         filterChain.doFilter(request, response);

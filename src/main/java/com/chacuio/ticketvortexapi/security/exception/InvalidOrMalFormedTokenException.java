@@ -1,6 +1,8 @@
 package com.chacuio.ticketvortexapi.security.exception;
 
-public class InvalidOrMalFormedTokenException extends RuntimeException {
+import io.jsonwebtoken.JwtException;
+
+public class InvalidOrMalFormedTokenException extends JwtException {
     public InvalidOrMalFormedTokenException(String message) {
         super(message);
     }
