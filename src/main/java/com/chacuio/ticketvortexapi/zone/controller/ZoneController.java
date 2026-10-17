@@ -23,15 +23,16 @@ import java.util.UUID;
 @RequestMapping("/api/v1/zones")
 @RequiredArgsConstructor
 @Tag(name = "Zones", description = "Endpoints for managing event zones")
-@SecurityRequirement(name = "Admin Authentication")
+@SecurityRequirement(name = "Bearer Authentication")
 public class ZoneController {
 
     private final ZoneService zoneService;
 
     @Operation(summary = "Get zone by ID", description = "Returns full information of a zone including associated event summary")
     @ApiResponse(responseCode = "200", description = "Zone retrieved successfully")
+    @ApiResponse(responseCode = "401", description = "Unauthorized: Missing or invalid JWT")
     @ApiResponse(responseCode = "404", description = "Zone not found")
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'CUSTOMER')")
     @GetMapping("/{id}")
     public ResponseEntity<ZoneResponseDTO> findById(
             @Parameter(description = "Unique identifier of the zone", example = "550e8400-e29b-41d4-a716-446655440000")
@@ -41,7 +42,8 @@ public class ZoneController {
 
     @Operation(summary = "Get zones by event ID", description = "Returns all zones associated with a specific event")
     @ApiResponse(responseCode = "200", description = "Zones retrieved successfully")
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @ApiResponse(responseCode = "401", description = "Unauthorized: Missing or invalid JWT")
+    @PreAuthorize("hasAnyRole('ADMIN', 'CUSTOMER')")
     @GetMapping("/events/{eventId}")
     public ResponseEntity<List<ZoneSummaryDTO>> findAllByEventId(
             @Parameter(description = "Unique identifier of the event", example = "550e8400-e29b-41d4-a716-446655440000")
@@ -52,6 +54,8 @@ public class ZoneController {
     @Operation(summary = "Add zone to an event", description = "Creates and attaches a new zone to an existing event")
     @ApiResponse(responseCode = "201", description = "Zone created successfully")
     @ApiResponse(responseCode = "400", description = "Invalid zone data")
+    @ApiResponse(responseCode = "401", description = "Unauthorized: Missing or invalid JWT")
+    @ApiResponse(responseCode = "403", description = "Forbidden: Requires ADMIN role")
     @ApiResponse(responseCode = "404", description = "Event not found")
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/events/{eventId}")

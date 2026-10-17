@@ -9,11 +9,13 @@ import com.chacuio.ticketvortexapi.reservation.service.ReservationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,11 +25,15 @@ import java.util.UUID;
 @RequestMapping("/api/v1/reservations")
 @RequiredArgsConstructor
 @Tag(name = "Reservations", description = "Endpoints for managing reservations")
+@SecurityRequirement(name = "Bearer Authentication")
 public class ReservationController {
     private final ReservationService reservationService;
 
     @Operation(summary = "Get reservations by event ID", description = "Returns all reservations associated with an event.")
     @ApiResponse(responseCode = "200", description = "Reservations retrieved successfully")
+    @ApiResponse(responseCode = "401", description = "Unauthorized: Missing or invalid JWT")
+    @ApiResponse(responseCode = "403", description = "Forbidden: Requires ADMIN role")
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{eventId}")
     public ResponseEntity<List<ReservationSummaryDTO>> findAll(
             @Parameter(description = "Unique identifier of the event", example = "550e8400-e29b-41d4-a716-446655440000")
@@ -37,6 +43,8 @@ public class ReservationController {
 
     @Operation(summary = "Get reservations by customer ID", description = "Returns all reservations associated with a customer.")
     @ApiResponse(responseCode = "200", description = "Reservations retrieved successfully")
+    @ApiResponse(responseCode = "401", description = "Unauthorized: Missing or invalid JWT")
+    @PreAuthorize("hasAnyRole('ADMIN', 'CUSTOMER')")
     @GetMapping("/customer/{customerId}")
     public ResponseEntity<List<ReservationSummaryDTO>> findAllByCustomerId(
             @Parameter(description = "Unique identifier of the customer", example = "550e8400-e29b-41d4-a716-446655440000")
@@ -46,7 +54,9 @@ public class ReservationController {
 
     @Operation(summary = "Get reservation by ID", description = "Returns the complete information of a reservation.")
     @ApiResponse(responseCode = "200", description = "Reservation found successfully")
+    @ApiResponse(responseCode = "401", description = "Unauthorized: Missing or invalid JWT")
     @ApiResponse(responseCode = "404", description = "Reservation not found")
+    @PreAuthorize("hasAnyRole('ADMIN', 'CUSTOMER')")
     @GetMapping("/search/{reservationId}")
     public ResponseEntity<ReservationResponseDTO> findById(
             @Parameter(description = "Unique identifier of the reservation", example = "550e8400-e29b-41d4-a716-446655440000")
@@ -57,7 +67,9 @@ public class ReservationController {
     @Operation(summary = "Create reservations", description = "Creates reservations for a customer using the supplied request data.")
     @ApiResponse(responseCode = "201", description = "Reservations created successfully")
     @ApiResponse(responseCode = "400", description = "Invalid reservation data or insufficient capacity")
+    @ApiResponse(responseCode = "401", description = "Unauthorized: Missing or invalid JWT")
     @ApiResponse(responseCode = "404", description = "Customer or zone not found")
+    @PreAuthorize("hasAnyRole('ADMIN', 'CUSTOMER')")
     @PostMapping("/{customerId}")
     public ResponseEntity<List<ReservationResponseDTO>> reserve(
             @Valid @RequestBody ReservationRequestDTO dto,
@@ -71,7 +83,9 @@ public class ReservationController {
     @Operation(summary = "Confirm reservation payment", description = "Confirms all reservations associated with the idempotency key.")
     @ApiResponse(responseCode = "200", description = "Payment confirmed successfully")
     @ApiResponse(responseCode = "400", description = "Invalid payment confirmation data or reservation expired")
+    @ApiResponse(responseCode = "401", description = "Unauthorized: Missing or invalid JWT")
     @ApiResponse(responseCode = "404", description = "Reservations not found")
+    @PreAuthorize("hasAnyRole('ADMIN', 'CUSTOMER')")
     @PostMapping("/confirm-payment")
     public ResponseEntity<ConfirmPaymentResponseDTO> confirmPayment(
             @Valid @RequestBody ConfirmPaymentRequestDTO dto
@@ -81,7 +95,10 @@ public class ReservationController {
 
     @Operation(summary = "Delete reservation", description = "Deletes a reservation by its ID.")
     @ApiResponse(responseCode = "204", description = "Reservation deleted successfully")
+    @ApiResponse(responseCode = "401", description = "Unauthorized: Missing or invalid JWT")
+    @ApiResponse(responseCode = "403", description = "Forbidden: Requires ADMIN role")
     @ApiResponse(responseCode = "404", description = "Reservation not found")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{reservationId}")
     public ResponseEntity<Void> delete(
             @Parameter(description = "Unique identifier of the reservation", example = "550e8400-e29b-41d4-a716-446655440000")
