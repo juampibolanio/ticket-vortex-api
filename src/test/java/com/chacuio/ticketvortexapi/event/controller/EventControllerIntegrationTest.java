@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -36,8 +37,7 @@ class EventControllerIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
 
     @Autowired
     private EventRepository eventRepository;
@@ -53,22 +53,21 @@ class EventControllerIntegrationTest {
 
     @Test
     @DisplayName("Integration: Should create an event with its zones successfully")
+    @WithMockUser(roles = "ADMIN")
     void createEventWithZones_Success() throws Exception {
         // Given / Arrange
         ZoneRequestDTO vipZone = new ZoneRequestDTO(
                 "VIP",
                 "VIP Zone Description",
                 new BigDecimal("15000.00"),
-                100,
-                null
+                100
         );
 
         ZoneRequestDTO generalZone = new ZoneRequestDTO(
                 "GENERAL",
                 "General Admission",
                 new BigDecimal("8000.00"),
-                200,
-                null
+                200
         );
 
         EventRequestDTO requestDto = new EventRequestDTO(
@@ -111,13 +110,13 @@ class EventControllerIntegrationTest {
 
     @Test
     @DisplayName("Integration: Should return 400 Bad Request when title is blank")
+    @WithMockUser(roles = "ADMIN")
     void createEvent_InvalidTitle_BadRequest() throws Exception {
         ZoneRequestDTO zone = new ZoneRequestDTO(
                 "VIP",
                 "VIP Zone",
                 new BigDecimal("15000.00"),
-                100,
-                null
+                100
         );
 
         EventRequestDTO invalidRequest = new EventRequestDTO(
