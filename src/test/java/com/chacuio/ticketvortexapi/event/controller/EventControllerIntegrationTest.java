@@ -101,7 +101,7 @@ class EventControllerIntegrationTest {
 
     @Test
     @DisplayName("Integration: Should return 404 when event id does not exist")
-    @WithMockUser(roles = "USER")
+    @WithMockUser(roles = "CUSTOMER")
     void findById_NotFound() throws Exception {
         UUID nonExistingId = UUID.randomUUID();
 

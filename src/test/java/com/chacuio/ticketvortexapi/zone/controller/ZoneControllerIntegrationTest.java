@@ -62,7 +62,7 @@ class ZoneControllerIntegrationTest {
 
     @Test
     @DisplayName("Integration: Should return zone by ID successfully")
-    @WithMockUser(roles = "USER")
+    @WithMockUser(roles = "CUSTOMER")
     void findById_Success() throws Exception {
         Zone zone = Zone.builder()
                 .name("Campo General")
@@ -83,7 +83,7 @@ class ZoneControllerIntegrationTest {
 
     @Test
     @DisplayName("Integration: Should return 404 when zone does not exist")
-    @WithMockUser(roles = "USER")
+    @WithMockUser(roles = "CUSTOMER")
     void findById_NotFound() throws Exception {
         UUID nonExistingId = UUID.randomUUID();
 
@@ -96,7 +96,7 @@ class ZoneControllerIntegrationTest {
 
     @Test
     @DisplayName("Integration: Should return all zones by event ID")
-    @WithMockUser(roles = "USER")
+    @WithMockUser(roles = "CUSTOMER")
     void findAllByEventId_Success() throws Exception {
         Zone zone1 = Zone.builder().name("VIP").price(new BigDecimal("30000")).capacity(100).event(testEvent).build();
         Zone zone2 = Zone.builder().name("Campo").price(new BigDecimal("15000")).capacity(300).event(testEvent).build();
@@ -130,7 +130,7 @@ class ZoneControllerIntegrationTest {
 
     @Test
     @DisplayName("Integration: Should return 403 Forbidden when a USER tries to create a zone")
-    @WithMockUser(roles = "USER")
+    @WithMockUser(roles = "CUSTOMER")
     void createZone_AsUser_Forbidden() throws Exception {
         ZoneRequestDTO requestDto = new ZoneRequestDTO(
                 "Hack Zone",
