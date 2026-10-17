@@ -121,8 +121,7 @@ class ZoneServiceImplTest {
                 "VIP",
                 null,
                 new BigDecimal("2000"),
-                20,
-                eventId
+                20
         );
 
         Zone zoneEntity = new Zone();
@@ -151,7 +150,7 @@ class ZoneServiceImplTest {
 
         // When
         ZoneSummaryDTO result =
-                zoneService.create(requestDto);
+                zoneService.create(eventId, requestDto);
 
         // Then
         assertThat(result)
@@ -181,8 +180,7 @@ class ZoneServiceImplTest {
                 "VIP",
                 null,
                 new BigDecimal("2000"),
-                20,
-                eventId
+                20
         );
 
         when(eventRepository.findById(eventId))
@@ -190,7 +188,7 @@ class ZoneServiceImplTest {
 
         // When & Then
         assertThatThrownBy(
-                () -> zoneService.create(requestDto)
+                () -> zoneService.create(eventId, requestDto)
         )
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessage(
