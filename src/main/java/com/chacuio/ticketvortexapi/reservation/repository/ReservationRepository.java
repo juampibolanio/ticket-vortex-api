@@ -3,6 +3,8 @@ package com.chacuio.ticketvortexapi.reservation.repository;
 import com.chacuio.ticketvortexapi.reservation.dto.ReservationSummaryDTO;
 import com.chacuio.ticketvortexapi.reservation.model.Reservation;
 import com.chacuio.ticketvortexapi.reservation.model.Status;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -32,7 +34,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, UUID> 
         JOIN z.event e
         WHERE e.id = :event_id
     """)
-    List<ReservationSummaryDTO> findAllSummarizedByEventId(@Param("event_id") UUID eventId);
+    Page<ReservationSummaryDTO> findAllSummarizedByEventId(@Param("event_id") UUID eventId, Pageable pageable);
 
     @Query("""
         SELECT new com.chacuio.ticketvortexapi.reservation.dto.ReservationSummaryDTO(
@@ -51,7 +53,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, UUID> 
         JOIN r.zone z
         WHERE u.id = :customer_id
     """)
-    List<ReservationSummaryDTO> findAllSummarizedByCustomerId(@Param("customer_id") UUID customerId);
+    Page<ReservationSummaryDTO> findAllSummarizedByCustomerId(@Param("customer_id") UUID customerId, Pageable pageable);
 
     List<Reservation> findByIdempotencyKey(UUID uuid);
 

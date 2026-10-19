@@ -13,6 +13,9 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -35,10 +38,11 @@ public class ReservationController {
     @ApiResponse(responseCode = "403", description = "Forbidden: Requires ADMIN role")
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{eventId}")
-    public ResponseEntity<List<ReservationSummaryDTO>> findAll(
+    public ResponseEntity<Page<ReservationSummaryDTO>> findAll(
             @Parameter(description = "Unique identifier of the event", example = "550e8400-e29b-41d4-a716-446655440000")
-            @PathVariable UUID eventId) {
-        return ResponseEntity.ok(reservationService.findAllByEventId(eventId));
+            @PathVariable UUID eventId,
+            @PageableDefault(sort = "createdAt") Pageable pageable) {
+        return ResponseEntity.ok(reservationService.findAllByEventId(eventId, pageable));
     }
 
     @Operation(summary = "Get reservations by customer ID", description = "Returns all reservations associated with a customer.")
@@ -46,10 +50,11 @@ public class ReservationController {
     @ApiResponse(responseCode = "401", description = "Unauthorized: Missing or invalid JWT")
     @PreAuthorize("hasAnyRole('ADMIN', 'CUSTOMER')")
     @GetMapping("/customer/{customerId}")
-    public ResponseEntity<List<ReservationSummaryDTO>> findAllByCustomerId(
+    public ResponseEntity<Page<ReservationSummaryDTO>> findAllByCustomerId(
             @Parameter(description = "Unique identifier of the customer", example = "550e8400-e29b-41d4-a716-446655440000")
-            @PathVariable UUID customerId) {
-        return ResponseEntity.ok(reservationService.findAllByCustomerId(customerId));
+            @PathVariable UUID customerId,
+            @PageableDefault(sort = "createdAt") Pageable pageable) {
+        return ResponseEntity.ok(reservationService.findAllByCustomerId(customerId, pageable));
     }
 
     @Operation(summary = "Get reservation by ID", description = "Returns the complete information of a reservation.")

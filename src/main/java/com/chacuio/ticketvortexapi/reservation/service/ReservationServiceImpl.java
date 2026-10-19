@@ -15,6 +15,8 @@ import com.chacuio.ticketvortexapi.zone.model.Zone;
 import com.chacuio.ticketvortexapi.zone.service.ZoneService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,13 +38,13 @@ public class ReservationServiceImpl implements ReservationService {
     private final UserService userService;
 
     @Override
-    public List<ReservationSummaryDTO> findAllByEventId(UUID eventId) {
-        return reservationRep.findAllSummarizedByEventId(eventId);
+    public Page<ReservationSummaryDTO> findAllByEventId(UUID eventId, Pageable pageable) {
+        return reservationRep.findAllSummarizedByEventId(eventId, pageable);
     }
 
     @Override
-    public List<ReservationSummaryDTO> findAllByCustomerId(UUID customerId) {
-        return reservationRep.findAllSummarizedByCustomerId(customerId);
+    public Page<ReservationSummaryDTO> findAllByCustomerId(UUID customerId, Pageable pageable) {
+        return reservationRep.findAllSummarizedByCustomerId(customerId, pageable);
     }
 
     @Override

@@ -15,10 +15,8 @@ import com.chacuio.ticketvortexapi.reservation.model.Reservation;
 import com.chacuio.ticketvortexapi.reservation.model.Status;
 import com.chacuio.ticketvortexapi.reservation.repository.ReservationRepository;
 import com.chacuio.ticketvortexapi.user.model.User;
-import com.chacuio.ticketvortexapi.user.repository.UserRepository;
 import com.chacuio.ticketvortexapi.user.service.UserService;
 import com.chacuio.ticketvortexapi.zone.model.Zone;
-import com.chacuio.ticketvortexapi.zone.repository.ZoneRepository;
 import com.chacuio.ticketvortexapi.zone.service.ZoneService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,6 +25,10 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.time.Instant;
 import java.util.List;
@@ -58,24 +60,26 @@ class ReservationServiceImplTest {
     @DisplayName("Should find all reservation summaries by event")
     void findAllByEventId_ReturnsReservations() {
         UUID eventId = UUID.randomUUID();
-        List<ReservationSummaryDTO> expected = List.of(summary());
-        when(reservationRepository.findAllSummarizedByEventId(eventId)).thenReturn(expected);
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<ReservationSummaryDTO> expected = new PageImpl<>(List.of(summary()));
+        when(reservationRepository.findAllSummarizedByEventId(eventId, pageable)).thenReturn(expected);
 
-        assertEquals(expected, reservationService.findAllByEventId(eventId));
+        assertEquals(expected, reservationService.findAllByEventId(eventId, pageable));
 
-        verify(reservationRepository).findAllSummarizedByEventId(eventId);
+        verify(reservationRepository).findAllSummarizedByEventId(eventId, pageable);
     }
 
     @Test
     @DisplayName("Should find all reservation summaries by customer")
     void findAllByCustomerId_ReturnsReservations() {
         UUID customerId = UUID.randomUUID();
-        List<ReservationSummaryDTO> expected = List.of(summary());
-        when(reservationRepository.findAllSummarizedByCustomerId(customerId)).thenReturn(expected);
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<ReservationSummaryDTO> expected = new PageImpl<>(List.of(summary()));
+        when(reservationRepository.findAllSummarizedByCustomerId(customerId, pageable)).thenReturn(expected);
 
-        assertEquals(expected, reservationService.findAllByCustomerId(customerId));
+        assertEquals(expected, reservationService.findAllByCustomerId(customerId, pageable));
 
-        verify(reservationRepository).findAllSummarizedByCustomerId(customerId);
+        verify(reservationRepository).findAllSummarizedByCustomerId(customerId, pageable);
     }
 
     @Test
