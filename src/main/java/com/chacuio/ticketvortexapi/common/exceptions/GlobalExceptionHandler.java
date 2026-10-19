@@ -4,13 +4,13 @@ import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
-
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorResponseDTO> handleResourceNotFoundException(
             ResourceNotFoundException ex,
@@ -47,6 +46,14 @@ public class GlobalExceptionHandler {
             HttpServletRequest request) {
         log.warn("Data integrity conflict at {}", request.getRequestURI());
         return response("The request conflicts with existing data", HttpStatus.CONFLICT, request);
+    }
+
+    @ExceptionHandler(OptimisticLockingFailureException.class)
+    public ResponseEntity<ErrorResponseDTO> handleOptimisticLockingFailure(
+            OptimisticLockingFailureException ex,
+            HttpServletRequest request) {
+        log.warn("Concurrency conflict (optimistic lock failure) at {}: {}", request.getRequestURI(), ex.getMessage());
+        return response("The resource was updated concurrently by another request. Please try again.", HttpStatus.CONFLICT, request);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
@@ -119,7 +126,6 @@ public class GlobalExceptionHandler {
         return response("Request body is invalid", HttpStatus.BAD_REQUEST, request);
     }
 
-
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDTO> handleGenericException(
             Exception ex,
@@ -127,7 +133,6 @@ public class GlobalExceptionHandler {
         log.error("An unexpected error occurred at {}", request.getRequestURI(), ex);
         return response("An unexpected error occurred", HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
-
 
     private ResponseEntity<ErrorResponseDTO> response(
             String message,
@@ -158,5 +163,4 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(status).body(error);
     }
-
 }
