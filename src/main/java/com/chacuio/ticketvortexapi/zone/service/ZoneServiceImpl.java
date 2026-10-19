@@ -9,15 +9,16 @@ import com.chacuio.ticketvortexapi.zone.dto.ZoneSummaryDTO;
 import com.chacuio.ticketvortexapi.zone.mapper.ZoneMapper;
 import com.chacuio.ticketvortexapi.zone.model.Zone;
 import com.chacuio.ticketvortexapi.zone.repository.ZoneRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ZoneServiceImpl implements ZoneService {
     private final ZoneRepository zoneRepository;
     private final EventRepository eventRepository;
@@ -35,8 +36,8 @@ public class ZoneServiceImpl implements ZoneService {
         return mapper.toDto(zone);
     }
 
-    @Transactional
     @Override
+    @Transactional
     public List<ZoneSummaryDTO> createAll(Event event, List<ZoneRequestDTO> zoneDtos) {
         List<Zone> zones = zoneDtos.stream()
                 .map(dto -> mapper.toEntity(dto, event))
@@ -49,8 +50,8 @@ public class ZoneServiceImpl implements ZoneService {
                 .toList();
     }
 
-    @Transactional
     @Override
+    @Transactional
     public ZoneSummaryDTO create(UUID eventId, ZoneRequestDTO dto) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new ResourceNotFoundException("Event not found with id: " + eventId));
@@ -61,6 +62,7 @@ public class ZoneServiceImpl implements ZoneService {
     }
 
     @Override
+    @Transactional
     public Zone findEntityByIdWithLock(UUID id) {
         return zoneRepository.findByIdWithLock(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Zone not found"));

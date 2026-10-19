@@ -13,10 +13,10 @@ import com.chacuio.ticketvortexapi.user.model.User;
 import com.chacuio.ticketvortexapi.user.service.UserService;
 import com.chacuio.ticketvortexapi.zone.model.Zone;
 import com.chacuio.ticketvortexapi.zone.service.ZoneService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -28,6 +28,7 @@ import java.util.UUID;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ReservationServiceImpl implements ReservationService {
     private final ReservationRepository reservationRep;
     private final ReservationMapper reservationMapper;
@@ -171,6 +172,7 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
+    @Transactional
     public void delete(UUID id) {
         Reservation reservation = reservationRep.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Reservation with id: " + id + " not found"));

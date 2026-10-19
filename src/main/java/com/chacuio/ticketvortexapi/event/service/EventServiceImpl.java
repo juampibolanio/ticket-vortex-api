@@ -7,20 +7,18 @@ import com.chacuio.ticketvortexapi.event.dto.EventSummaryDTO;
 import com.chacuio.ticketvortexapi.event.mapper.EventMapper;
 import com.chacuio.ticketvortexapi.event.model.Event;
 import com.chacuio.ticketvortexapi.event.repository.EventRepository;
-import com.chacuio.ticketvortexapi.zone.dto.ZoneRequestDTO;
 import com.chacuio.ticketvortexapi.zone.dto.ZoneSummaryDTO;
-import com.chacuio.ticketvortexapi.zone.mapper.ZoneMapper;
 import com.chacuio.ticketvortexapi.zone.service.ZoneService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class EventServiceImpl implements EventService {
     private final EventRepository eventRepository;
     private final ZoneService zoneService;
