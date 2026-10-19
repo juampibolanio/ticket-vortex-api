@@ -10,11 +10,12 @@ import com.chacuio.ticketvortexapi.user.mapper.UserMapper;
 import com.chacuio.ticketvortexapi.user.model.User;
 import com.chacuio.ticketvortexapi.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -26,11 +27,9 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public List<UserSummaryDTO> findAll() {
-        List<User> users = userRepository.findAll();
-        return users.stream()
-                .map(userMapper::toSummaryDto)
-                .toList();
+    public Page<UserSummaryDTO> findAll(Pageable pageable) {
+        return userRepository.findAll(pageable)
+                .map(userMapper::toSummaryDto);
     }
 
     @Override

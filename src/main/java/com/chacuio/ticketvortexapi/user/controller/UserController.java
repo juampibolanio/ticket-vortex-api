@@ -12,12 +12,14 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -28,14 +30,15 @@ import java.util.UUID;
 public class UserController {
     private final UserService userService;
 
-    @Operation(summary = "Get all users", description = "Returns a list with all registered users.")
+    @Operation(summary = "Get all users", description = "Returns a paginated list with all registered users.")
     @ApiResponse(responseCode = "200", description = "Users retrieved successfully")
     @ApiResponse(responseCode = "401", description = "Unauthorized: Missing or invalid JWT")
     @ApiResponse(responseCode = "403", description = "Forbidden: Requires ADMIN role")
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
-    public ResponseEntity<List<UserSummaryDTO>> findAll() {
-        return ResponseEntity.ok(userService.findAll());
+    public ResponseEntity<Page<UserSummaryDTO>> findAll(
+            @PageableDefault(sort = "lastName") Pageable pageable) {
+        return ResponseEntity.ok(userService.findAll(pageable));
     }
 
     @Operation(summary = "Get user by ID", description = "Returns the complete information of a user.")
