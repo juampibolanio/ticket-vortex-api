@@ -34,5 +34,6 @@ build/
 
 ### Environment ###
 .env
-.env.dev
-.env.production
+.env.*
+!.env.example
+!.env.*.example
