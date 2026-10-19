@@ -10,6 +10,8 @@ import com.chacuio.ticketvortexapi.event.repository.EventRepository;
 import com.chacuio.ticketvortexapi.zone.dto.ZoneSummaryDTO;
 import com.chacuio.ticketvortexapi.zone.service.ZoneService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,12 +27,9 @@ public class EventServiceImpl implements EventService {
     private final EventMapper eventMapper;
 
     @Override
-    public List<EventSummaryDTO> findAll() {
-        List<Event>  events = eventRepository.findAll();
-
-        return events.stream()
-                .map(eventMapper::toDtoSummary)
-                .toList();
+    public Page<EventSummaryDTO> findAll(Pageable pageable) {
+        return eventRepository.findAll(pageable)
+                .map(eventMapper::toDtoSummary);
     }
 
     @Override

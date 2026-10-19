@@ -11,12 +11,14 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -27,13 +29,14 @@ import java.util.UUID;
 public class EventController {
     private final EventService eventService;
 
-    @Operation(summary = "Get all events", description = "Returns a list with all registered events")
+    @Operation(summary = "Get all events", description = "Returns a paginated list with all registered events")
     @ApiResponse(responseCode = "200", description = "Events retrieved successfully")
     @ApiResponse(responseCode = "401", description = "Unauthorized: Missing or invalid JWT")
     @PreAuthorize("hasAnyRole('ADMIN', 'CUSTOMER')")
     @GetMapping
-    public ResponseEntity<List<EventSummaryDTO>> findAll() {
-        return ResponseEntity.ok(eventService.findAll());
+    public ResponseEntity<Page<EventSummaryDTO>> findAll(
+            @PageableDefault(sort = "date")  Pageable pageable) {
+        return ResponseEntity.ok(eventService.findAll(pageable));
     }
 
     @Operation(summary = "Get event by ID", description = "Returns the complete information of an event, including its zones.")
