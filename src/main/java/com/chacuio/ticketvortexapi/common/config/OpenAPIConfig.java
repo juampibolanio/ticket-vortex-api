@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
 
 @OpenAPIDefinition(
         info = @Info(
-                title = "Ticket Vortex Web API",
+                title = "Ticket Vortex API",
                 version = "1.0.0",
                 contact = @Contact(
                         name = "Juan Pablo Bolanio", email = "juampi360786@gmail.com", url = "https://portfolio-juampi-bolanio.vercel.app/"
@@ -21,10 +21,16 @@ import org.springframework.context.annotation.Configuration;
                         name = "Apache 2.0", url = "https://apache.org/licenses/LICENSE-2.0"
                 )
         ),
-        servers = @Server(
-                url = "http://localhost:8080",
-                description = "Production"
-        )
+        servers = {
+                @Server(
+                        url = "http://localhost:8080",
+                        description = "Development Server (Local)"
+                ),
+                @Server(
+                        url = "/",
+                        description = "Current Environment / Production Server"
+                )
+        }
 )
 @SecurityScheme(
         name = "Bearer Authentication",
