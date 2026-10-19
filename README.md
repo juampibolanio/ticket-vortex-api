@@ -3,7 +3,7 @@
 ![Java](https://img.shields.io/badge/Java-21-orange?style=for-the-badge&logo=openjdk)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.1.1-brightgreen?style=for-the-badge&logo=springboot)
 ![Spring Security](https://img.shields.io/badge/Spring%20Security-JWT-green?style=for-the-badge&logo=springsecurity)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue?style=for-the-badge&logo=postgresql)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-18-blue?style=for-the-badge&logo=postgresql)
 ![Flyway](https://img.shields.io/badge/Flyway-Migration-red?style=for-the-badge&logo=flyway)
 ![OpenAPI](https://img.shields.io/badge/OpenAPI%203-Swagger%20UI-yellow?style=for-the-badge&logo=swagger)
 
@@ -111,7 +111,7 @@ Esto libera automáticamente el cupo de la zona para otros compradores cuando se
 | **Seguridad** | Spring Security | 6.x |
 | **Tokens** | JJWT (`jjwt-api`, `jjwt-impl`, `jjwt-jackson`) | 0.12.6 |
 | **Persistencia** | Spring Data JPA / Hibernate | 6.x / Jakarta Persistence 3.x |
-| **Base de Datos** | PostgreSQL (Producción) / H2 (Testing) | 16+ / 2.4 |
+| **Base de Datos** | PostgreSQL (Producción) / H2 (Testing) | 18+ / 2.4 |
 | **Migraciones** | Flyway | Integrado con Spring Boot |
 | **Validaciones** | Jakarta Validation (Hibernate Validator) | 3.0+ |
 | **Documentación** | Springdoc OpenAPI Starter WebMvc UI | 3.1.0 |
@@ -180,84 +180,132 @@ src/
 
 ---
 
-## 🔧 Configuración y Variables de Entorno
+## 🔧 Entornos, Perfiles y Variables de Entorno
 
-La aplicación carga automáticamente las variables desde un archivo `.env` o a través de variables de entorno del sistema operativo.
+TicketVortex API cuenta con una arquitectura de configuración multi-entorno basada en perfiles de Spring Boot (`dev`, `prod`, `test`) y lectura centralizada desde variables de entorno / archivo `.env`.
 
-Crea un archivo `.env` en la raíz del proyecto:
+### 1. Perfiles Disponibles
 
-```properties
-# Base de Datos PostgreSQL
-DB_URL=jdbc:postgresql://localhost:5432/ticketvortexdb
-DB_USER=postgres
-DB_PASSWORD=tu_contraseña
+| Característica | Perfil `dev` (Desarrollo) | Perfil `prod` (Producción) | Perfil `test` (Testing) |
+| :--- | :--- | :--- | :--- |
+| **Activación** | `SPRING_PROFILES_ACTIVE=dev` | `SPRING_PROFILES_ACTIVE=prod` | `@ActiveProfiles("test")` |
+| **Base de Datos** | PostgreSQL local / Docker | PostgreSQL productiva (RDS, Cloud SQL, etc.) | H2 In-Memory (`testdb`) |
+| **SQL en Consola** | Activado (`show-sql` y formateo legible) | Desactivado (seguridad y rendimiento) | Activado |
+| **Pool HikariCP** | Liviano (máx. 5 conexiones) | Ajustado para alta concurrencia (máx. 20) | Pool H2 por defecto |
+| **Nivel de Logging** | `DEBUG` en paquete raíz, SQL y seguridad | `WARN` en raíz, `INFO` en paquete de negocio | `INFO` |
+| **Swagger UI** | Siempre habilitado (`/swagger-ui.html`) | Configurable con `SWAGGER_ENABLED=true` | N/A |
+| **CORS** | Orígenes locales (`localhost:3000`, `5173`) | Dominios oficiales de producción | Localhost |
 
-# Configuración JWT (HMAC-SHA-256: mínimo 256 bits / 32 caracteres)
-JWT_SECRET=404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+---
+
+### 2. Plantillas de Configuración (`.env`)
+
+En la raíz del proyecto se incluyen plantillas preconfiguradas:
+- [`.env.example`](file:///C:/Users/juamp/OneDrive/Desktop/ticketvortexapi/.env.example): Plantilla maestra con todas las variables documentadas.
+- [`.env.dev.example`](file:///C:/Users/juamp/OneDrive/Desktop/ticketvortexapi/.env.dev.example): Ajustes listos para desarrollo local.
+- [`.env.prod.example`](file:///C:/Users/juamp/OneDrive/Desktop/ticketvortexapi/.env.prod.example): Ajustes recomendados para entornos de producción.
+
+Para iniciar rápidamente en desarrollo:
+```bash
+# Copiar plantilla de desarrollo
+cp .env.dev.example .env
 ```
 
-### Configuración en `application.properties`
+Para iniciar en producción:
+```bash
+# Copiar plantilla de producción y completar credenciales reales
+cp .env.prod.example .env
+```
+
+---
+
+### 3. Variables de Entorno Soportadas
 
 ```properties
-spring.application.name=ticketvortexapi
-spring.config.import=optional:file:.env[.properties]
-spring.jackson.time-zone=UTC
+# --- Perfil y Servidor ---
+SPRING_PROFILES_ACTIVE=dev         # 'dev' o 'prod' (por defecto: 'dev')
+SERVER_PORT=8080                   # Puerto HTTP (por defecto: 8080)
 
-# Conexión JPA / PostgreSQL
-spring.datasource.driver-class-name=org.postgresql.Driver
-spring.datasource.url=${DB_URL}
-spring.datasource.username=${DB_USER}
-spring.datasource.password=${DB_PASSWORD}
-spring.jpa.hibernate.ddl-auto=validate
+# --- Base de Datos PostgreSQL ---
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=ticketvortexdb
+DB_USER=postgres
+DB_PASSWORD=tu_password
+DB_URL=jdbc:postgresql://localhost:5432/ticketvortexdb
 
-# Parámetros JWT
-security.jwt.secret=${JWT_SECRET}
-security.jwt.expiration=3600000        # 1 hora en ms
-security.jwt.renew-time=604800000      # 7 días en ms
+# --- Pool HikariCP ---
+DB_POOL_MAX_SIZE=10                # Conexiones máximas
+DB_POOL_MIN_IDLE=2                 # Conexiones ociosas mínimas
+
+# --- Seguridad JWT ---
+JWT_SECRET=tu_secreto_seguro_minimo_256_bits
+JWT_EXPIRATION=3600000             # Tiempo de vida en ms (1 hora)
+JWT_RENEW_TIME=604800000           # Ventana de renovación en ms (7 días)
+
+# --- CORS ---
+CORS_ALLOWED_ORIGINS=http://localhost:3000,http://localhost:5173
+
+# --- Documentación Swagger ---
+SWAGGER_ENABLED=true               # Forzar Swagger en producción
 ```
 
 ---
 
 ## 🛠 Instalación y Ejecución
 
-### Prerrequisitos
-- **Java 21 JDK** instalado y configurado en `JAVA_HOME`.
-- **PostgreSQL 15+** en ejecución con la base de datos creada:
-  ```sql
-  CREATE DATABASE ticketvortexdb;
-  ```
+### Opción A: Entorno de Desarrollo Local
 
-### Pasos para levantar el servicio
-
-1. **Clonar el repositorio:**
+1. **Iniciar PostgreSQL con Docker Compose:**
    ```bash
-   git clone https://github.com/tu-usuario/ticketvortexapi.git
-   cd ticketvortexapi
+   docker compose up -d ticketvortex-db
    ```
 
-2. **Crear el archivo `.env`** con las credenciales correspondientes.
-
-3. **Compilar y verificar las pruebas:**
+2. **Configurar el archivo `.env`:**
    ```bash
-   # En Windows
-   .\mvnw.cmd clean test
-
-   # En Linux / macOS
-   ./mvnw clean test
+   cp .env.dev.example .env
    ```
 
-4. **Ejecutar la aplicación:**
+3. **Ejecutar las pruebas unitarias y de integración:**
    ```bash
-   # En Windows
+   # Windows
+   .\mvnw.cmd test
+
+   # Linux / macOS
+   ./mvnw test
+   ```
+
+4. **Iniciar la aplicación en modo desarrollo:**
+   ```bash
+   # Windows
    .\mvnw.cmd spring-boot:run
 
-   # En Linux / macOS
+   # Linux / macOS
    ./mvnw spring-boot:run
    ```
 
-La API quedará escuchando en `http://localhost:8080`.
-
 ---
+
+### Opción B: Entorno de Producción con Docker (Full Stack)
+
+El proyecto incluye un [`Dockerfile`](file:///C:/Users/juamp/OneDrive/Desktop/ticketvortexapi/Dockerfile) multi-etapa optimizado y un [`docker-compose.prod.yml`](file:///C:/Users/juamp/OneDrive/Desktop/ticketvortexapi/docker-compose.prod.yml):
+
+1. **Preparar el entorno de producción:**
+   ```bash
+   cp .env.prod.example .env
+   # Edita .env con tus credenciales y secretos de producción
+   ```
+
+2. **Construir y levantar la base de datos y la API:**
+   ```bash
+   docker compose -f docker-compose.prod.yml up --build -d
+   ```
+
+3. **Verificar el estado de los contenedores:**
+   ```bash
+   docker compose -f docker-compose.prod.yml ps
+   docker compose -f docker-compose.prod.yml logs -f ticketvortex-prod-api
+   ```
 
 ## 🔒 Seguridad y Autenticación (JWT)
 
