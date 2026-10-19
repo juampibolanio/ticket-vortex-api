@@ -28,13 +28,15 @@ public class ReservationExpirationTask {
         List<Reservation> expiredReservations = repository.findByStatusAndExpiresAtBefore(Status.RESERVED, now);
 
         if (expiredReservations.isEmpty()) {
-            log.info("Found {} expired reservations. Expiring them now...", expiredReservations.size());
-
-            for (Reservation reservation : expiredReservations) {
-                reservation.setStatus(Status.EXPIRED);
-            }
-
-            repository.saveAll(expiredReservations);
+            return;
         }
+
+        log.info("Found {} expired reservations. Expiring them now...", expiredReservations.size());
+
+        for (Reservation reservation : expiredReservations) {
+            reservation.setStatus(Status.EXPIRED);
+        }
+
+        repository.saveAll(expiredReservations);
     }
 }
