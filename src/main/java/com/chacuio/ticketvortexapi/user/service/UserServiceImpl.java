@@ -10,6 +10,7 @@ import com.chacuio.ticketvortexapi.user.mapper.UserMapper;
 import com.chacuio.ticketvortexapi.user.model.User;
 import com.chacuio.ticketvortexapi.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,6 +21,7 @@ import java.util.UUID;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public List<UserSummaryDTO> findAll() {
@@ -44,12 +46,14 @@ public class UserServiceImpl implements UserService {
             throw new DataConflictException("Email already exists");
         }
 
-        return  userMapper.toDto(userRepository.save(userMapper.toEntity(dto)));
+        User user = userMapper.toEntity(dto);
+        user.setPassword(passwordEncoder.encode(dto.password()));
+        return userMapper.toDto(userRepository.save(user));
     }
 
     @Override
     public UserResponseDTO patch(UUID id, UserPatchRequestDTO dto) {
-        User user =  userRepository.findById(id)
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
 
         if (dto.email() != null && !dto.email().equals(user.getEmail())
