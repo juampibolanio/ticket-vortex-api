@@ -57,7 +57,7 @@ class UserControllerIntegrationTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content", hasSize(2)))
-                .andExpect(jsonPath("$.totalElements", is(2)));
+                .andExpect(jsonPath("$.page.totalElements", is(2)));
     }
 
     @Test
