@@ -91,7 +91,9 @@ public class SecurityConfig {
                                 "/api/v1/auth/register",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
-                                "/swagger-ui.html"
+                                "/swagger-ui.html",
+                                "/actuator/health",
+                                "/actuator/info"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
